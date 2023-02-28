@@ -1,3 +1,4 @@
+import { IsUrl, Length } from 'class-validator';
 import { Offer } from 'src/offers/entities/offer.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -15,37 +16,45 @@ export class Wish {
   id: number;
 
   @CreateDateColumn()
-  createdAt: string;
+  createdAt: Date;
 
   @CreateDateColumn()
-  updatedAt: string;
+  updatedAt: Date;
 
-  @Column({
-    length: 250,
-  })
+  @Column()
+  @Length(1, 250)
   name: string;
 
   @Column()
+  @IsUrl()
   link: string;
 
   @Column()
+  @IsUrl()
   image: string;
 
-  @Column()
+  @Column({
+    type: 'numeric',
+    scale: 2,
+  })
   price: number;
 
-  @Column()
+  @Column({
+    type: 'numeric',
+    scale: 2,
+  })
   raised: number;
-
-  @Column()
-  copied: number;
-
-  @Column()
-  description: string;
 
   @ManyToOne(() => User, (user) => user.wishes)
   owner: User;
 
+  @Column()
+  @Length(1, 1024)
+  description: string;
+
   @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
+
+  @Column()
+  copied: number;
 }

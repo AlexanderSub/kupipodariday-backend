@@ -8,6 +8,7 @@ import { User } from './users/entities/user.entity';
 import { Wish } from './wishes/entities/wish.entity';
 import { WishList } from './wishlists/entities/wishlist.entity';
 import { Offer } from './offers/entities/offer.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { Offer } from './offers/entities/offer.entity';
     WishesModule,
     WishlistsModule,
     OffersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

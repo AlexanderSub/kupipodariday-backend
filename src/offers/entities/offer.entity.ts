@@ -14,15 +14,18 @@ export class Offer {
   id: number;
 
   @CreateDateColumn()
-  createdAt: string;
+  createdAt: Date;
 
   @CreateDateColumn()
-  updatedAt: string;
+  updatedAt: Date;
 
   @ManyToOne(() => Wish, (wish) => wish.offers)
   item: Wish[];
 
-  @Column()
+  @Column({
+    type: 'numeric',
+    scale: 2,
+  })
   amount: number;
 
   @Column()

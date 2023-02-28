@@ -1,3 +1,4 @@
+import { Length, MaxLength } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Wish } from 'src/wishes/entities/wish.entity';
 import {
@@ -16,13 +17,18 @@ export class WishList {
   id: number;
 
   @CreateDateColumn()
-  createdAt: string;
+  createdAt: Date;
 
   @CreateDateColumn()
-  updatedAt: string;
+  updatedAt: Date;
 
   @Column()
+  @Length(1, 250)
   name: string;
+
+  @Column()
+  @MaxLength(1500)
+  description: string;
 
   @Column()
   image: string;
