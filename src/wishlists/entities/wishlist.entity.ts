@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class WishList {
+export class Wishlist {
   @PrimaryGeneratedColumn()
   id: number;
 

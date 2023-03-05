@@ -28,7 +28,9 @@ export class Offer {
   })
   amount: number;
 
-  @Column()
+  @Column({
+    default: false,
+  })
   hidden: boolean;
 
   @ManyToOne(() => User, (user) => user.offers)

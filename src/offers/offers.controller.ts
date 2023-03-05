@@ -22,9 +22,13 @@ export class OffersController {
     return this.offersService.createOffer(createOfferDto);
   }
 
+  async findAll(): Promise<Offer[]> {
+    return this.offersService.findAll();
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.findOne(id);
+    return this.offersService.findOne(id);
   }
 
   @Patch(':id')

@@ -1,24 +1,25 @@
-import { IsNotEmpty, Length } from 'class-validator';
+import { Length } from 'class-validator';
 import { Offer } from 'src/offers/entities/offer.entity';
 import { Wish } from 'src/wishes/entities/wish.entity';
-import { WishList } from 'src/wishlists/entities/wishlist.entity';
+import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn() //Декоратор поля
+  @PrimaryGeneratedColumn()
   id: number;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @CreateDateColumn()
+  @UpdateDateColumn()
   updatedAt: Date;
 
   @Column({
@@ -43,10 +44,7 @@ export class User {
   })
   email: string;
 
-  @Column({
-    select: false,
-  })
-  @IsNotEmpty()
+  @Column()
   password: string;
 
   @OneToMany(() => Wish, (wish) => wish.owner)
@@ -55,6 +53,6 @@ export class User {
   @OneToMany(() => Offer, (offer) => offer.user)
   offers: Offer[];
 
-  @OneToMany(() => WishList, (wishlist) => wishlist.owner)
-  wishlists: WishList[];
+  @OneToMany(() => Wishlist, (wishlist) => wishlist.owner)
+  wishlists: Wishlist[];
 }

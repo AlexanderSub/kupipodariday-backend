@@ -4,14 +4,20 @@ import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { OffersModule } from './offers/offers.module';
+import { Offer } from './offers/entities/offer.entity';
 import { User } from './users/entities/user.entity';
 import { Wish } from './wishes/entities/wish.entity';
-import { WishList } from './wishlists/entities/wishlist.entity';
-import { Offer } from './offers/entities/offer.entity';
+import { Wishlist } from './wishlists/entities/wishlist.entity';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import configuration from './configuration';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      load: [configuration],
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -19,14 +25,14 @@ import { AuthModule } from './auth/auth.module';
       username: 'student',
       password: 'student',
       database: 'kupipodariday',
-      entities: [User, Wish, WishList, Offer],
-      synchronize: true, // означает, что при старте приложение будет подгонять базу в СУБД к той, что описана в ORM. Удобно для разработки, но точно не стоит использовать в продакшене, поскольку может привести к неочевидным изменениям и конфликтам при работе нескольких разработчиков.
+      entities: [Offer, User, Wish, Wishlist],
+      synchronize: true,
     }),
     UsersModule,
     WishesModule,
     WishlistsModule,
     OffersModule,
-    // AuthModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

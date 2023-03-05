@@ -1,50 +1,56 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  NotFoundException,
-  Param,
-  ParseIntPipe,
-  Patch,
   Post,
+  Body,
+  Patch,
+  Req,
+  Param,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
+import { FindUserDto } from './dto/find-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { Wish } from 'src/wishes/entities/wish.entity';
+import { UserPasswordInterceptor } from 'src/interceptors/user-password.interceptor';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { IUserRequest } from 'src/types';
 
+@UseInterceptors(UserPasswordInterceptor)
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  findAll(): Promise<User[]> {
-    return this.usersService.findAll();
+  @Get('me')
+  find(@Req() req: IUserRequest) {
+    return this.usersService.findById(req.user.id);
   }
 
-  @Post()
-  create(@Body() user: CreateUserDto) {
-    return this.usersService.create(user);
+  @Patch('me')
+  update(@Req() req: IUserRequest, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateById(req.user.id, updateUserDto);
   }
 
-  @Delete(':id')
-  async removeById(@Param('id', ParseIntPipe) id: number) {
-    const user = await this.usersService.findById(id);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    await this.usersService.removeById(id);
+  @Get(':username')
+  findUserByName(@Param('username') username: string) {
+    return this.usersService.findByUsername(username);
   }
-  @Patch(':id')
-  async updateById(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    const user = await this.usersService.findById(id);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    this.updateById(id, updateUserDto);
+
+  @Post('find')
+  findMany(@Body() findUser: FindUserDto) {
+    return this.usersService.findMany(findUser);
+  }
+
+  @Get('me/wishes')
+  getOwnWishes(@Req() req: IUserRequest): Promise<Wish[]> {
+    return this.usersService.getOwnUserWishes(req.user.id);
+  }
+
+  @Get(':username/wishes')
+  async getUsersWishes(@Param('username') username: string): Promise<Wish[]> {
+    const user = await this.usersService.findByUsername(username);
+    return await this.usersService.getOwnUserWishes(user.id);
   }
 }

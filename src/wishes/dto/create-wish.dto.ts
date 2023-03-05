@@ -1,20 +1,18 @@
-import { IsPositive, IsString, IsUrl, Length } from 'class-validator';
+import { Length, IsUrl, IsInt } from 'class-validator';
 
 export class CreateWishDto {
-  @IsString()
   @Length(1, 250)
   name: string;
 
   @IsUrl()
-  link: string;
+  link?: string;
 
   @IsUrl()
-  image: string;
+  image?: string;
 
-  @IsPositive()
-  price: number;
+  @IsInt()
+  price?: number;
 
-  @IsString()
   @Length(1, 1024)
-  description: string;
+  description?: string;
 }
