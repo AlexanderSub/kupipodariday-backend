@@ -64,7 +64,7 @@ export class UsersService {
     return users;
   }
 
-  async getOwnUserWishes(id: number) {
+  async getUsersWishes(id: number) {
     const wishes = await this.wishesRepository.find({
       where: { owner: { id } },
       relations: ['owner'],

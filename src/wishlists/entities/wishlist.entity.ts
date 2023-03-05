@@ -1,15 +1,16 @@
-import { Length, MaxLength } from 'class-validator';
-import { User } from 'src/users/entities/user.entity';
-import { Wish } from 'src/wishes/entities/wish.entity';
 import {
+  Entity,
+  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  Entity,
-  JoinTable,
-  ManyToMany,
+  UpdateDateColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
+import { Length, MaxLength } from 'class-validator';
+import { Wish } from 'src/wishes/entities/wish.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Entity()
 export class Wishlist {
@@ -19,14 +20,14 @@ export class Wishlist {
   @CreateDateColumn()
   createdAt: Date;
 
-  @CreateDateColumn()
+  @UpdateDateColumn()
   updatedAt: Date;
 
   @Column()
   @Length(1, 250)
   name: string;
 
-  @Column()
+  @Column({ default: '' })
   @MaxLength(1500)
   description: string;
 

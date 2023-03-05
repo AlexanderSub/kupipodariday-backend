@@ -49,6 +49,11 @@ export class WishesController {
     return await this.wishesService.updateOne(+id, updateWishDto, req.user.id);
   }
 
+  @Get()
+  findAll() {
+    return this.wishesService.findAll();
+  }
+
   @Delete(':id')
   async removeOne(@Req() req: IUserRequest, @Param('id') id: string) {
     return await this.wishesService.removeOne(+id, req.user.id);

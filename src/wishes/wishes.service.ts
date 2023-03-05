@@ -54,6 +54,12 @@ export class WishesService {
     return await this.wishesRepository.find(arg);
   }
 
+  findAll() {
+    return this.wishesRepository.find({
+      relations: { owner: true, offers: true },
+    });
+  }
+
   async updateOne(
     wishId: number,
     updateWishDto: UpdateWishDto,
@@ -91,6 +97,7 @@ export class WishesService {
   async copyWish(id: number, req: IUserRequest) {
     const wish = await this.findOne(id);
     await this.wishesRepository.update(id, { copied: ++wish.copied });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id: wishId, createdAt, updatedAt, owner, ...rest } = wish;
     const newWish = {
       ...rest,

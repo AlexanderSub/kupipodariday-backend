@@ -1,6 +1,6 @@
-import { IsString } from 'class-validator';
+import { MinLength } from 'class-validator';
 
 export class FindUserDto {
-  @IsString()
+  @MinLength(2)
   query: string;
 }

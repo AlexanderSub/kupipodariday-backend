@@ -1,12 +1,13 @@
-import { User } from 'src/users/entities/user.entity';
-import { Wish } from 'src/wishes/entities/wish.entity';
 import {
+  Entity,
+  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  Entity,
+  UpdateDateColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { Wish } from 'src/wishes/entities/wish.entity';
 
 @Entity()
 export class Offer {
@@ -16,16 +17,13 @@ export class Offer {
   @CreateDateColumn()
   createdAt: Date;
 
-  @CreateDateColumn()
+  @UpdateDateColumn()
   updatedAt: Date;
 
   @ManyToOne(() => Wish, (wish) => wish.offers)
-  item: Wish[];
+  item: Wish;
 
-  @Column({
-    type: 'numeric',
-    scale: 2,
-  })
+  @Column()
   amount: number;
 
   @Column({
