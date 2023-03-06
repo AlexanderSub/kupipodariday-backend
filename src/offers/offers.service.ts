@@ -33,15 +33,16 @@ export class OffersService {
       throw new ForbiddenException('Деньги на подарок уже собраны');
     }
 
-    await this.wishesService.updateOne(
-      wish.id,
-      { raised: +offerSum },
-      wish.owner.id,
-    );
-
-    await this.offersRepository.save({ ...createOfferDto, user, item: wish });
-
-    return null;
+    await this.wishesService.updateOne(wish.id, {
+      raised: Number(wish.raised) + Number(createOfferDto.amount),
+    });
+    const updateWish = await this.wishesService.findOne(wish.id);
+    delete createOfferDto.itemId;
+    return this.offersRepository.save({
+      ...createOfferDto,
+      user,
+      item: updateWish,
+    });
   }
 
   async findAll() {

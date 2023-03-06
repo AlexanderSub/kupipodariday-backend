@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from './entities/wish.entity';
 import { IUserRequest } from 'src/types';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class WishesService {
@@ -60,23 +61,13 @@ export class WishesService {
     });
   }
 
-  async updateOne(
-    wishId: number,
-    updateWishDto: UpdateWishDto,
-    userId: number,
-  ) {
-    const wish = await this.findOne(wishId);
+  async findUserWishes(user: User) {
+    const wishes = await this.findAll();
+    return wishes.filter((wish) => wish.owner.id === user.id);
+  }
 
-    if (!wish) {
-      throw new NotFoundException('Подарок не найден');
-    }
-
-    if (userId !== wish.owner.id) {
-      throw new ForbiddenException('Нельзя редактировать чужие подарки');
-    }
-
-    await this.wishesRepository.update(wishId, updateWishDto);
-    return {};
+  async updateOne(id: number, updateWishDto: UpdateWishDto) {
+    return await this.wishesRepository.update({ id }, { ...updateWishDto });
   }
 
   async removeOne(wishId: number, userId: number) {

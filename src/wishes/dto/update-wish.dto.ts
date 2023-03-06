@@ -1,8 +1,9 @@
 import { PartialType } from '@nestjs/mapped-types';
+import { IsNumber, IsOptional } from 'class-validator';
 import { CreateWishDto } from './create-wish.dto';
-import { IsInt } from 'class-validator';
 
 export class UpdateWishDto extends PartialType(CreateWishDto) {
-  @IsInt()
+  @IsOptional()
+  @IsNumber()
   raised?: number;
 }
