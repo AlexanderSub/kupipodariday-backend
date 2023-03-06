@@ -16,12 +16,16 @@ import { Wish } from 'src/wishes/entities/wish.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { IUserRequest } from 'src/types';
 import { SensitiveDataInterceptor } from 'src/interceptors/sensitive-data.interceptor';
+import { WishesService } from 'src/wishes/wishes.service';
 
 @UseInterceptors(SensitiveDataInterceptor)
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly wishesService: WishesService,
+  ) {}
 
   @Get('me')
   asyncfind(@Req() req: IUserRequest) {
@@ -45,12 +49,12 @@ export class UsersController {
 
   @Get('me/wishes')
   getOwnWishes(@Req() req: IUserRequest): Promise<Wish[]> {
-    return this.usersService.getUsersWishes(req.user.id);
+    return this.wishesService.findUserWishes(req.user);
   }
 
   @Get(':username/wishes')
   async getUsersWishes(@Param('username') username: string): Promise<Wish[]> {
     const user = await this.usersService.findByUsername(username);
-    return await this.usersService.getUsersWishes(user.id);
+    return await this.wishesService.findUserWishes(user);
   }
 }

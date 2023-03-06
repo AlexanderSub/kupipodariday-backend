@@ -34,24 +34,17 @@ export class UsersService {
     return user;
   }
 
-  async findByUsername(username: string): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ username });
-    if (!user) throw new NotFoundException('Пользователь не найден');
+  async findByUsername(username: string, password = false): Promise<User> {
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect(password ? 'user.password' : '')
+      .where('user.username = :username', { username })
+      .getOne();
     return user;
   }
 
   async updateById(id: number, updateUserDto: UpdateUserDto) {
-    const { password } = updateUserDto;
-    if (password) {
-      const hash = await bcrypt.hash(password, 10);
-      const user = await this.usersRepository.update(id, {
-        ...updateUserDto,
-        password: hash,
-      });
-      return user;
-    } else {
-      return await this.usersRepository.update(id, updateUserDto);
-    }
+    return await this.usersRepository.update({ id }, { ...updateUserDto });
   }
 
   async findMany({ query }: FindUserDto): Promise<User[]> {
@@ -62,13 +55,5 @@ export class UsersService {
       throw new NotFoundException('Пользователь не найден');
     }
     return users;
-  }
-
-  async getUsersWishes(id: number) {
-    const wishes = await this.wishesRepository.find({
-      where: { owner: { id } },
-      relations: ['owner'],
-    });
-    return wishes;
   }
 }
