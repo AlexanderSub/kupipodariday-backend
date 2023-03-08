@@ -6,45 +6,67 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
 import * as bcrypt from 'bcrypt';
-import { Wish } from 'src/wishes/entities/wish.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-    @InjectRepository(Wish)
-    private readonly wishesRepository: Repository<Wish>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.usersRepository.create(createUserDto);
-    const { password, ...result } = user;
-    const hash = await bcrypt.hash(password, 10);
-    return await this.usersRepository.save({ password: hash, ...result });
+  async create(createUserDto: CreateUserDto) {
+    const hash = await bcrypt.hash(createUserDto.password, 10);
+    const newUser = this.usersRepository.create({
+      ...createUserDto,
+      password: hash,
+    });
+    const user = await this.usersRepository.save(newUser);
+    delete user.password;
+    return user;
   }
 
   async findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+    const users = await this.usersRepository.find();
+
+    return users;
   }
 
   async findById(id: number): Promise<User> {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) throw new NotFoundException('Пользователь не найден');
+
+    if (user.password) delete user.password;
+
     return user;
   }
 
-  async findByUsername(username: string, password = false): Promise<User> {
-    const user = await this.usersRepository
-      .createQueryBuilder('user')
-      .addSelect(password ? 'user.password' : '')
-      .where('user.username = :username', { username })
-      .getOne();
+  async findByUsername(username: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { username },
+      select: [
+        'id',
+        'password',
+        'email',
+        'createdAt',
+        'updatedAt',
+        'about',
+        'avatar',
+      ],
+    });
+
     return user;
   }
 
   async updateById(id: number, updateUserDto: UpdateUserDto) {
-    return await this.usersRepository.update({ id }, { ...updateUserDto });
+    if (updateUserDto.password) {
+      const hash = await bcrypt.hash(updateUserDto.password, 10);
+      updateUserDto.password = hash;
+    }
+
+    await this.usersRepository.update({ id }, updateUserDto);
+    const user = await this.findById(id);
+
+    return user;
   }
 
   async findMany({ query }: FindUserDto): Promise<User[]> {
@@ -54,6 +76,12 @@ export class UsersService {
     if (!users) {
       throw new NotFoundException('Пользователь не найден');
     }
+
+    users.map((data) => {
+      if (Array.isArray(data)) data.forEach((obj) => delete obj.password);
+      if (data.password) delete data.password;
+    });
+
     return users;
   }
 }
