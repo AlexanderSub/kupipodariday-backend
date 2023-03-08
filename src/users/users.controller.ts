@@ -7,7 +7,6 @@ import {
   Req,
   Param,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FindUserDto } from './dto/find-user.dto';
@@ -15,10 +14,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Wish } from 'src/wishes/entities/wish.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { IUserRequest } from 'src/types';
-import { SensitiveDataInterceptor } from 'src/interceptors/sensitive-data.interceptor';
 import { WishesService } from 'src/wishes/wishes.service';
 
-@UseInterceptors(SensitiveDataInterceptor)
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
@@ -28,8 +25,12 @@ export class UsersController {
   ) {}
 
   @Get('me')
-  asyncfind(@Req() req: IUserRequest) {
-    return this.usersService.findById(req.user.id);
+  async find(@Req() req: IUserRequest) {
+    const profile = await this.usersService.findById(req.user.id);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = profile;
+
+    return result;
   }
 
   @Patch('me')
